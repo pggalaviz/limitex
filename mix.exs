@@ -40,7 +40,7 @@ defmodule Limitex.MixProject do
   defp deps do
     [
       # Production dependencies
-      {:shards, git: "https://github.com/cabol/shards.git"},
+      {:shards, "~> 0.6.0"},
       # Benchmarking dependencies
       {:benchee, "~> 0.13.2", optional: true, only: [:bench]}
     ]
