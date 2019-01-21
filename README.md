@@ -14,7 +14,7 @@ You can add this package to your project dependencies:
 # mix.exs
 def deps do
   [
-    {:limitex, git: "https://github.com/pggalaviz/limitex.git"}
+    {:limitex, "~> 0.1.0"}
   ]
 end
 ```
