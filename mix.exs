@@ -6,7 +6,7 @@ defmodule Limitex.MixProject do
   def project do
     [
       app: :limitex,
-      description: "A pure Elixir rate limiter",
+      description: "A pure Elixir distributed rate limiter",
       package: [
         name: :limitex,
         maintainers: ["Pedro G. Galaviz (hello@pggalaviz.com)"],
