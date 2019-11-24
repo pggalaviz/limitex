@@ -38,7 +38,7 @@ defmodule Limitex.MixProject do
       # Benchmarking dependencies
       {:benchee, "~> 1.0", only: [:dev]},
       # Docs
-      {:ex_doc, "~> 0.21.2"}
+      {:ex_doc, "~> 0.21", only: [:dev], runtime: false}
     ]
   end
 

@@ -14,7 +14,7 @@ You can add this package to your project dependencies:
 # mix.exs
 def deps do
   [
-    {:limitex, "~> 0.1.0"}
+    {:limitex, "~> 0.1.1"}
   ]
 end
 ```
