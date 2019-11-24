@@ -1,27 +1,21 @@
 defmodule Limitex.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
       app: :limitex,
+      version: @version,
       description: "A pure Elixir distributed rate limiter",
-      package: [
-        name: :limitex,
-        maintainers: ["Pedro G. Galaviz (hello@pggalaviz.com)"],
-        licenses: ["MIT"],
-        links: %{"GitHub" => "https://github.com/pggalaviz/limitex"}
-      ],
+      package: package(),
       source_url: "https://github.com/pggalaviz/limitex",
       homepage_url: "https://github.com/pggalaviz/limitex",
-      version: @version,
-      elixir: "~> 1.8",
+      elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
-      preferred_cli_env: [
-        bench: :bench
-      ],
+      docs: docs(),
       aliases: [
         bench: "run benchmarks/main.exs"
       ]
@@ -40,9 +34,36 @@ defmodule Limitex.MixProject do
   defp deps do
     [
       # Production dependencies
-      {:shards, "~> 0.6.0"},
+      {:shards, "~> 0.6.1"},
       # Benchmarking dependencies
-      {:benchee, "~> 0.13.2", optional: true, only: [:bench]}
+      {:benchee, "~> 1.0", only: [:dev]},
+      # Docs
+      {:ex_doc, "~> 0.21.2"}
     ]
   end
+
+  defp package do
+    [
+      name: :limitex,
+      maintainers: ["Pedro G. Galaviz (hello@pggalaviz.com)"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/pggalaviz/limitex"},
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE*)
+    ]
+  end
+
+  defp docs do
+    [
+      source_ref: "v#{@version}",
+      canonical: "http://hexdocs.pm/limitex",
+      source_url: "https://github.com/pggalaviz/limitex",
+      extras: [
+        "README.md"
+      ]
+    ]
+  end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
