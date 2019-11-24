@@ -21,6 +21,7 @@ defmodule Limitex.RateLimiter do
   # Client API
   # ==========
 
+  @doc false
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -30,6 +31,7 @@ defmodule Limitex.RateLimiter do
   - `id`: String name of the bucket. Usually comprised of a fixed prefix and some dynamic string appended
   - `scale_ms`: Integer indicating size of bucket in milliseconds
   - `limit`: Integer maximum count of actions within the bucket
+
   Example:
       user_id = 42076
       case check_rate("file_upload:\#{user_id}", 60_000, 5) do
@@ -64,6 +66,7 @@ defmodule Limitex.RateLimiter do
   # Server Callbacks
   # ================
 
+  @impl GenServer
   def init(_opts) do
     interval = Application.get_env(:limitex, :cleanup_interval, @cleanup_interval)
     expiry = Application.get_env(:limitex, :expiry, @expiry)
@@ -81,6 +84,7 @@ defmodule Limitex.RateLimiter do
     {:ok, %{interval: interval, expiry: expiry}}
   end
 
+  @impl GenServer
   def handle_info(:clear, state) do
     Shards.join(@table, Node.list())
     expire_before = _now() - state.expiry

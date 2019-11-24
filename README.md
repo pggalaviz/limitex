@@ -3,12 +3,26 @@
 A pure Elixir distributed rate limiter based on the
 [Token Bucket](https://en.wikipedia.org/wiki/Token_bucket) algorithm.
 
+## Description
+
 **Limitex** uses sharded ETS tables with write and read concurrency enabled, node
-clustering is not handled, something like **libcluster** is recomended.
+clustering is not handled by this package, something like [libcluster](https://github.com/bitwalker/libcluster) is recomended.
+
+#### Example
+
+```elixir
+=> Limitex.check_rate("127.0.0.1", 60_000, 2)
+{:ok, 1}
+=> Limitex.check_rate("127.0.0.1", 60_000, 2)
+{:ok, 2}
+=> Limitex.check_rate("127.0.0.1", 60_000, 2)
+{:error, :rate_limited}
+```
+
 
 ## Installation
 
-You can add this package to your project dependencies:
+You can find **Limitex** in [Hex.pm](https://hex.pm/packages/limitex) and you can add it to your project dependencies:
 
 ```elixir
 # mix.exs
@@ -18,10 +32,40 @@ def deps do
   ]
 end
 ```
+## Configuration
+
+**Limitex** will perform scheduled cleanups to remove expired buckets, to handle
+this, we should provide a cleanup interval and an expiry:
+
+```elixir
+# config.exs
+
+config :limitex,
+  cleanup_interval: 60_000, # 1 minute (defaults to 5 minutes)
+  expiry: 300_000 # 5 minutes (defaults to 15 minutes)
+```
+
+Table cleanups will be scheduled every minute in this example (defaults to 5
+minutes), and will delete buckets where expiry has already passed, it's
+important to give a value greater than the biggest bucket we create (the
+bucket_time param in `check_rate` function, see below).
+
+So if we're creating a bucket of 1 hour: `Limitex.check_rate("some_id",
+3_600_000, 20)` we should give a bigger number in our config to prevent cleanup
+to delete buckets which are not yet expired:
+
+```elixir
+# config.exs
+
+config :limitex,
+  expiry: 3_800_000
+```
+
+`expiry` defaults to 15 minutes.
 
 ## Usage
 
-Limitex exports a single function: `check_rate/3` and `check_rate/4`.
+**Limitex** exports a single function: `check_rate/3` and `check_rate/4`.
 
 * `check_rate(id, bucket_time, limit)`
 * `check_rate(id, bucket_time, limit, increment)`
@@ -44,7 +88,7 @@ identifier (see example below).
   increased by 1 as a default, you can alternatively pass an arbitrary integer
   to increase the limit.
 
-#### Examples
+## Examples
 
 Inside your app you can call it inside any function:
 
@@ -65,37 +109,14 @@ end
 
 So in the above example we'll limit user's uploads to 5 every 60 seconds.
 
-#### Configuration
-
-**Limitex** will perform scheduled cleanups to remove expired buckets, to handle
-this, we should provide a cleanup interval and an expiry:
-
-```elixir
-# inside config.exs
-
-config :limitex,
-  cleanup_interval: 60_000,
-  expiry: 300_000
-```
-
-Table cleanups will be scheduled every minute in this example (defaults to 5
-minutes), and will delete buckets where expiry has already passed, it's
-important to give a value greater than the biggest bucket we create (the
-bucket_time param in `check_rate` function).
-
-So if we're creating a bucket of 1 hour: `Limitex.check_rate("some_id",
-3_600_000, 20)` we should give a bigger number in our config to prevent cleanup
-to delete buckets which are not yet expired:
-
-```elixir
-# inside config.exs
-
-config :limitex,
-  expiry: 3_800_000
-```
-
-`expiry` defaults to 15 minutes.
-
-#### Benchmarks
+## Benchmarks
 
 Basic benchmarks can be run with `mix bench`.
+
+These benchmarks were run on an iMac 4 GHz Intel Core i7 w/ 32GB RAM.
+
+```shell
+Name                             ips        average  deviation         median         99th %
+check_rate (100,000)        388.48 K        2.57 μs   ±892.63%        1.98 μs        4.98 μs
+check_rate (1,000,000)      395.01 K        2.53 μs   ±898.74%           2 μs           4 μs
+```
