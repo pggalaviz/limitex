@@ -1,5 +1,7 @@
 # Limitex
 
+[![Build Status](https://travis-ci.org/pggalaviz/limitex.svg?branch=master)](https://travis-ci.org/pggalaviz/limitex)
+
 A pure Elixir distributed rate limiter based on the
 [Token Bucket](https://en.wikipedia.org/wiki/Token_bucket) algorithm.
 
